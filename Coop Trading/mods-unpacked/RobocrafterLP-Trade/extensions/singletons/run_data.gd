@@ -27,3 +27,15 @@ func on_coop_trading_setting_changed(setting_name, value, mod_name): # Yes, func
 		is_trade_items_over_limit = value
 		if config != null:
 			config.data[trade_items_over_limit_config] = value
+
+func is_can_trade_item(object_data, player_index: int) -> bool:
+	if self.is_trade_items_over_limit:
+		return true
+	
+	if object_data is ItemData:
+		if self.get_remaining_max_nb_item(object_data, player_index) > 0 or self.get_remaining_max_nb_item(object_data, player_index) == -1:
+			return true
+		else:
+			return false
+	else:
+		return false
