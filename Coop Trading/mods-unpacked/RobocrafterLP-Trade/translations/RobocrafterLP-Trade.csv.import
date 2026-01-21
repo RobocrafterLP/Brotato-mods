@@ -5,10 +5,10 @@ type="Translation"
 
 [deps]
 
-files=[ "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.en.translation", "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.ru.translation" ]
+files=[ "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.en.translation", "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.de.translation", "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.ru.translation" ]
 
 source_file="res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.csv"
-dest_files=[ "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.en.translation", "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.ru.translation" ]
+dest_files=[ "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.en.translation", "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.de.translation", "res://mods-unpacked/RobocrafterLP-Trade/translations/RobocrafterLP-Trade.ru.translation" ]
 
 [params]
 

@@ -29,7 +29,12 @@ func on_weapon_trade_button_pressed_coop(weapon_data: WeaponData, from_player_in
 	SoundManager.play(Utils.get_rand_element(recycle_sounds), 0, 0.1, true)
 
 func on_item_trade_button_pressed_coop(item_data: ItemData, from_player_index: int = 0, to_player_index: int = 1) -> void:
-	if !is_can_trade_item(item_data, to_player_index):
+	var no_trade_items = ["item_celery_tea", "item_lure", "item_peacock"]
+	
+	if no_trade_items.has(item_data.my_id):
+		return
+
+	if !RunData.is_can_trade_item(item_data, to_player_index):
 		SoundManager.play(Utils.get_rand_element(Player.new().hurt_sounds), 0, 0.0, true)
 		return
 	

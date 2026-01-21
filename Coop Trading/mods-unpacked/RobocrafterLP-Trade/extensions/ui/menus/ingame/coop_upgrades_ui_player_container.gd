@@ -38,6 +38,11 @@ func _on_item_trade_button_pressed(to: int):
 	if _button_pressed:return 
 	_button_pressed = true
 	_button_delay_timer.start()
+
+	if !RunData.is_can_trade_item(_item_data, to):
+		SoundManager.play(Utils.get_rand_element(Player.new().hurt_sounds), 0, 0.0, true)
+		return
+
 	if _things_to_process_container:
 		_things_to_process_container.consumables.remove_element(_consumable_data)
 	emit_signal("item_trade_button_pressed", _item_data, to)
