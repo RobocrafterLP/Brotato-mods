@@ -1,7 +1,7 @@
 {
 	"name": "Trade",
 	"namespace": "RobocrafterLP",
-	"version_number": "1.2.5",
+	"version_number": "1.3.0",
 	"description": "Adding items and weapons trade",
 	"website_url": "",
 	"dependencies": ["dami-ModOptions"],

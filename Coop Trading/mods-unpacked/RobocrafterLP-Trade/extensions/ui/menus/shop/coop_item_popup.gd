@@ -5,6 +5,9 @@ signal item_trade_button_pressed_coop(item_data, player_index)
 
 var _ptrade = [null, null, null, null]
 var _pcbuttoncoop
+var _cancel_focus_neighbour_3: NodePath
+
+const TRADE_BUTTON_DUPLICATE_FLAGS = Node.DUPLICATE_GROUPS | Node.DUPLICATE_SCRIPTS | Node.DUPLICATE_USE_INSTANCING
 
 func Is_coop() -> bool:
 	return RunData.get_player_count() > 1
@@ -12,6 +15,8 @@ func Is_coop() -> bool:
 func _ready():
 	if not Is_coop():
 		return
+	# Cache the native path before update_trade_buttons() rewires CancelButton.
+	_cancel_focus_neighbour_3 = _cancel_button.get_focus_neighbour(3)
 	_pcbuttoncoop = _cancel_button.duplicate()
 	var children = _pcbuttoncoop.get_children()
 	for child in children:
@@ -19,9 +24,15 @@ func _ready():
 	if not _pcbuttoncoop:
 		return
 
+	# Clear inherited navigation paths before creating player-trade buttons.
+	for side in range(4):
+		_pcbuttoncoop.set_focus_neighbour(side, NodePath(""))
+	_pcbuttoncoop.focus_next = NodePath("")
+	_pcbuttoncoop.focus_previous = NodePath("")
+
 	for player_index in RunData.get_player_count():
 		var test = _discard_button.get_stylebox("normal").duplicate()
-		var button = _pcbuttoncoop.duplicate()
+		var button = _pcbuttoncoop.duplicate(TRADE_BUTTON_DUPLICATE_FLAGS)
 		button.text = "TRADE_GIVE_TO_PLAYER_BUTTON_%s" % str(player_index + 1)
 		button.name = "%%_p%s" % (player_index + 1)
 		button.connect("pressed", self, "_on_TradeButton_pressed_coop" + str(player_index + 1))
@@ -38,7 +49,7 @@ func update_trade_buttons() -> void:
 	var _p2
 	var _p3
 	var _p4
-	var cbd = _cancel_button.get_focus_neighbour(3)
+	var cbd = _cancel_focus_neighbour_3
 	# var s = _ptrade.size()
 	if player_index == 0:
 		_p2 = _ptrade[1]

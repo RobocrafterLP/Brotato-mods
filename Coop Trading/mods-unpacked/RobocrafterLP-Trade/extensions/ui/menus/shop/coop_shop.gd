@@ -45,12 +45,12 @@ func on_item_trade_button_pressed_coop(item_data: ItemData, from_player_index: i
 
 # Blatantly copied from the original game code.
 func _can_weapon_be_bought(weapon_data: WeaponData, player_index: int)->bool:
-	var min_weapon_tier = RunData.get_player_effect("min_weapon_tier", player_index)
-	var max_weapon_tier = RunData.get_player_effect("max_weapon_tier", player_index)
-	var no_melee_weapons = RunData.get_player_effect_bool("no_melee_weapons", player_index)
-	var no_ranged_weapons = RunData.get_player_effect_bool("no_ranged_weapons", player_index)
-	var no_duplicate_weapons = RunData.get_player_effect_bool("no_duplicate_weapons", player_index)
-	var lock_current_weapons = RunData.get_player_effect_bool("lock_current_weapons", player_index)
+	var min_weapon_tier = RunData.get_player_effect("min_weapon_tier".hash(), player_index)
+	var max_weapon_tier = RunData.get_player_effect("max_weapon_tier".hash(), player_index)
+	var no_melee_weapons = RunData.get_player_effect_bool("no_melee_weapons".hash(), player_index)
+	var no_ranged_weapons = RunData.get_player_effect_bool("no_ranged_weapons".hash(), player_index)
+	var no_duplicate_weapons = RunData.get_player_effect_bool("no_duplicate_weapons".hash(), player_index)
+	var lock_current_weapons = RunData.get_player_effect_bool("lock_current_weapons".hash(), player_index)
 
 	var weapon_type: = weapon_data.type
 	var weapons = RunData.get_player_weapons(player_index)

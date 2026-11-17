@@ -12,9 +12,7 @@ var translations_dir_path := ""
 # Extended func's
 func _init() -> void:
 	mod_dir_path = ModLoaderMod.get_unpacked_dir().plus_file(RobocrafterLP_Trade_DIR)
-	# Add extensions
 	install_script_extensions()
-	# Add translations
 	add_translations()
 
 func _ready() -> void:
@@ -32,14 +30,12 @@ func install_script_extensions() -> void:
 		"ui/menus/shop/coop_item_popup.gd"
 	]
 
-	# I don't think it makes much sense, but it looks cool
 	for extension in extensions:
 		ModLoaderMod.install_script_extension(extensions_dir_path.plus_file(extension))
 
 func add_translations() -> void:
 	translations_dir_path = mod_dir_path.plus_file("translations")
 
-	# Or maybe this is good practice?
 	var translations = [
 		"en",
 		"ru"
