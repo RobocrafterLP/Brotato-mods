@@ -20,106 +20,59 @@ func _ready():
 
 func on_weapon_trade_button_pressed_coop(weapon_data: WeaponData, from_player_index: int = 0, to_player_index: int = 1) -> void:
 	if !_can_weapon_be_bought(weapon_data, to_player_index):
-		SoundManager.play(Utils.get_rand_element(Player.new().hurt_sounds), 0, 0.0, true)
+		RunData.play_trade_refused_sound()
 		return
-	
+
 	process_player_weapons_inventory(weapon_data, from_player_index)
 	.buy_weapon(weapon_data, to_player_index)
-	
+	_update_stats(to_player_index)
+
 	SoundManager.play(Utils.get_rand_element(recycle_sounds), 0, 0.1, true)
 
 func on_item_trade_button_pressed_coop(item_data: ItemData, from_player_index: int = 0, to_player_index: int = 1) -> void:
-	var no_trade_items = ["item_celery_tea", "item_lure", "item_peacock"]
-	
-	if no_trade_items.has(item_data.my_id):
+	# Same single source of truth the popup uses to enable/disable the button.
+	if RunData.get_item_trade_block_reason(item_data, to_player_index) != RunData.ITB_OK:
+		RunData.play_trade_refused_sound()
 		return
 
-	if !RunData.is_can_trade_item(item_data, to_player_index):
-		SoundManager.play(Utils.get_rand_element(Player.new().hurt_sounds), 0, 0.0, true)
-		return
-	
 	process_player_items_inventory(item_data, from_player_index)
 	.buy_item(item_data, to_player_index)
-	
+	_update_stats(to_player_index)
+
 	SoundManager.play(Utils.get_rand_element(recycle_sounds), 0, 0.1, true)
 
-# Blatantly copied from the original game code.
-func _can_weapon_be_bought(weapon_data: WeaponData, player_index: int)->bool:
-	var min_weapon_tier = RunData.get_player_effect("min_weapon_tier", player_index)
-	var max_weapon_tier = RunData.get_player_effect("max_weapon_tier", player_index)
-	var no_melee_weapons = RunData.get_player_effect_bool("no_melee_weapons", player_index)
-	var no_ranged_weapons = RunData.get_player_effect_bool("no_ranged_weapons", player_index)
-	var no_duplicate_weapons = RunData.get_player_effect_bool("no_duplicate_weapons", player_index)
-	var lock_current_weapons = RunData.get_player_effect_bool("lock_current_weapons", player_index)
-
-	var weapon_type: = weapon_data.type
-	var weapons = RunData.get_player_weapons(player_index)
-	var weapon_slot_available: bool = RunData.has_weapon_slot_available(weapon_data, player_index)
-
-	var player_has_weapon = false
-	for weapon in weapons:
-		if weapon.my_id == weapon_data.my_id:
-			player_has_weapon = true
-			break
-
-	var player_has_weapon_family = false
-	if weapon_data.weapon_id in RunData.get_unique_weapon_ids(player_index):
-		player_has_weapon_family = true
-
-	if weapon_data.tier > max_weapon_tier or weapon_data.tier < min_weapon_tier:
-		return false
-
-	if no_melee_weapons and weapon_type == WeaponType.MELEE:
-		return false
-
-	if no_ranged_weapons and weapon_type == WeaponType.RANGED:
-		return false
-
-	if lock_current_weapons and not weapon_slot_available:
-		return false
-
-	if player_has_weapon and not weapon_slot_available and weapon_data.upgrades_into != null and weapon_data.upgrades_into.tier <= max_weapon_tier:
-		return true
-
-	if no_duplicate_weapons and player_has_weapon_family:
-		return false
-
-	return weapon_slot_available
-
-func is_can_trade_item(object_data, player_index: int) -> bool:
-	if RunData.is_trade_items_over_limit:
-		return true
-	
-	if object_data is ItemData:
-		if RunData.get_remaining_max_nb_item(object_data, player_index) > 0 or RunData.get_remaining_max_nb_item(object_data, player_index) == -1:
-			return true
-		else:
-			return false
-	else:
-		return false
+# Weapon trade eligibility lives in ONE place: RunData.get_weapon_trade_block_reason,
+# so this execution guard and the button state in coop_item_popup can never disagree.
+func _can_weapon_be_bought(weapon_data: WeaponData, player_index: int) -> bool:
+	return RunData.get_weapon_trade_block_reason(weapon_data, player_index) == RunData.WTB_OK
 
 func process_player_items_inventory(item_data: ItemData, player_index: int):
 	_popup_manager.reset_focus(player_index)
-	_update_stats(player_index)
-	
-	RunData.remove_item(item_data, player_index, false)
-		
+
+	# Remove just this slot, like vanilla's recycle does: the inventory then moves this player's
+	# selector to a neighbouring slot, or (via focus_lost) to Reroll/Go when the row is now empty.
+	# Rebuilding the whole row left the selector on a deleted slot and froze that player's controller.
+	_get_gear_container(player_index).items_container._elements.remove_element(item_data, 1, true)
+
+	# apply_replacement = false: the item lives on with the receiver, so the sender must not also get
+	# its replaced_by item (that duplicated e.g. Dino Egg into its next hatch stage).
+	RunData.remove_item(item_data, player_index, false, false)
+
 	_get_shop_items_container(player_index).reload_shop_items()
 	_get_coop_player_container(player_index).on_hide_focused_inventory_popup()
-	var player_gear_container = _get_gear_container(player_index)
-	var player_items: Array = RunData.get_player_items(player_index)
-	player_gear_container.set_items_data(player_items)
-	player_gear_container.items_container.focus_element_index(0)
+	# Refresh the stat panel AFTER the item and its effects are removed (was called before).
+	_update_stats(player_index)
 
 func process_player_weapons_inventory(weapon_data: WeaponData, player_index: int):
 	_popup_manager.reset_focus(player_index)
-	_update_stats(player_index)
-	
+
+	# Same as vanilla recycling: remove only this slot so the selector is re-homed properly
+	# (and the WEAPONS x/y label updates via elements_changed).
+	_get_gear_container(player_index).weapons_container._elements.remove_element(weapon_data, 1, true)
+
 	RunData.remove_weapon(weapon_data, player_index)
-	
+
 	_get_shop_items_container(player_index).reload_shop_items()
 	_get_coop_player_container(player_index).on_hide_focused_inventory_popup()
-	var player_gear_container = _get_gear_container(player_index)
-	var player_weapons: Array = RunData.get_player_weapons(player_index)
-	player_gear_container.set_weapons_data(player_weapons)
-	player_gear_container.items_container.focus_element_index(0)
+	# Refresh the stat panel AFTER the weapon and its effects are removed (was called before).
+	_update_stats(player_index)

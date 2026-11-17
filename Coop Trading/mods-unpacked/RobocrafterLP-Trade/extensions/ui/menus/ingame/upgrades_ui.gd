@@ -21,6 +21,7 @@ func _on_item_trade_button_pressed(item_data:ItemParentData, to_player_index:int
 	
 	LinkedStats.reset_player(player_index)
 	_update_player_stats(player_index)
+	_recheck_extra_items(player_index)
 	if not _extra_items_to_process[player_index]:
 		emit_signal("consumable_selected", consumable)
 		_showing_option[player_index] = null
