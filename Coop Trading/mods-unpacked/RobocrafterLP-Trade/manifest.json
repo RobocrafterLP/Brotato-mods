@@ -1,7 +1,7 @@
 {
 	"name": "Trade",
 	"namespace": "RobocrafterLP",
-	"version_number": "1.3.0",
+	"version_number": "1.4.0",
 	"description": "Adding items and weapons trade",
 	"website_url": "",
 	"dependencies": ["dami-ModOptions"],
@@ -10,8 +10,8 @@
 			"incompatibilities": [
 			],
 			"authors": ["RobocrafterLP", "Zeerck"],
-			"compatible_mod_loader_version": ["3.0.0"],
-			"compatible_game_version": ["0.6.1.6"],
+			"compatible_mod_loader_version": ["6.3.0"],
+			"compatible_game_version": ["1.2.0.1"],
 			"config_defaults": {},
 			"config_schema": {
 				"title": "Config_coop_trading",

@@ -38,6 +38,7 @@ func add_translations() -> void:
 
 	var translations = [
 		"en",
+		"de",
 		"ru"
 	]
 
